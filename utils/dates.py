@@ -63,7 +63,7 @@ def iso_range(
     tz: timezone = timezone.utc,
 ) -> Tuple[str, str]:
     """Convenience wrapper that returns the tuple as ISO‑8601 strings exactly
-    to the millisecond (\*YYYY‑MM‑DDTHH:MM:SS.mmmZ*)."""
+    to the millisecond (*YYYY‑MM‑DDTHH:MM:SS.mmmZ*)."""
 
     start_dt, end_dt = get_last_week_range(reference, tz)
     return (
