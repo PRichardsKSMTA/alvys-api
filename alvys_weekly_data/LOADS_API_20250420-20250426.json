@@ -1,0 +1,50 @@
+[
+  {
+    "Id": "fcdbc5a346a44112a157bae492bcd8d7",
+    "LoadNumber": "1037228",
+    "OrderNumber": "",
+    "PONumber": "",
+    "CustomerId": "",
+    "Status": "Open",
+    "CustomerType": [],
+    "Fleet": {
+      "Id": "fb3a37ef1c4f4442a112e50c69d1f695",
+      "Name": "georgia"
+    },
+    "InvoiceAs": "TRIBE EXPRESS INC",
+    "Linehaul": {
+      "Amount": 0.0,
+      "Currency": 840
+    },
+    "FuelSurcharge": {
+      "Amount": 0.0,
+      "Currency": 840
+    },
+    "CustomerRate": {
+      "Amount": 0.0,
+      "Currency": 840
+    },
+    "CustomerMileage": {
+      "Distance": {
+        "Value": 0.0,
+        "UnitOfMeasure": "Miles"
+      },
+      "Source": "Engine",
+      "ProfileId": "9fb385aa-6830-401e-8f14-d5eff36215cf",
+      "ProfileName": "Default"
+    },
+    "Weight": {
+      "Value": 0.0,
+      "UnitOfMeasure": "Pounds"
+    },
+    "ScheduledPickupAt": "2025-06-30T06:00:00+00:00",
+    "ScheduledDeliveryAt": "2025-06-30T23:59:00+00:00",
+    "Notes": [],
+    "CreatedAt": "2025-04-25T20:54:57.3723819+00:00",
+    "CreatedBy": "4bd38ef5372643e39d913351f9550b23",
+    "References": [],
+    "UpdatedAt": "2025-04-25T20:54:57.8215903+00:00",
+    "UpdatedBy": "4bd38ef5372643e39d913351f9550b23",
+    "FILE_ID": "20250617200551852"
+  }
+]

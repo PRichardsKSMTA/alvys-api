@@ -1,0 +1,5 @@
+pandas
+pyodbc
+Requests
+SQLAlchemy
+python-dotenv
