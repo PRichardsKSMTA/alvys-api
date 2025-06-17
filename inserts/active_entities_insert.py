@@ -125,22 +125,22 @@ def main():
 
     if run_all or "trailers" in args:
         print("Loading trailers JSON...")
-        trailers = [sanitize_trailer(t) for t in load_json("ACTIVE_TRAILERS.json")]
+        trailers = [sanitize_trailer(t) for t in load_json("TRAILERS.json")]
         batch_insert("TRAILERS_RAW", trailers, conn)
 
     if run_all or "trucks" in args:
         print("Loading trucks JSON...")
-        trucks = [sanitize_truck(t) for t in load_json("ACTIVE_TRUCKS.json")]
+        trucks = [sanitize_truck(t) for t in load_json("TRUCKS.json")]
         batch_insert("TRUCKS_RAW", trucks, conn)
 
     if run_all or "drivers" in args:
         print("Loading drivers JSON...")
-        drivers = [sanitize_driver(d) for d in load_json("ACTIVE_DRIVERS.json")]
+        drivers = [sanitize_driver(d) for d in load_json("DRIVERS.json")]
         batch_insert("DRIVERS_RAW", drivers, conn)
 
     if run_all or "customers" in args:
         print("Loading customers JSON...")
-        customers = [sanitize_customer(c) for c in load_json("ACTIVE_CUSTOMERS.json")]
+        customers = [sanitize_customer(c) for c in load_json("CUSTOMERS.json")]
         batch_insert("CUSTOMERS_RAW", customers, conn)
 
     print("\n✅ All data inserted.")

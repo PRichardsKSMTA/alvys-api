@@ -137,17 +137,17 @@ def export_endpoints(
         fname = f"{name.upper()}_API_{format_range(start_iso, end_iso)}.json"
         save_json(data, fname, output_dir)
 
-    # "Active" endpoints do not use date ranges
+    # These endpoints do not use date ranges
     if "drivers" in entities:
         drivers = fetch_paginated_data(
             f"{urls['base_url']}/drivers/search",
             headers,
-            {"name": "", "employeeId": "", "fleetName": "", "isActive": True},
+            {"name": "", "employeeId": "", "fleetName": "", "status": []},
         )
         file_id = get_file_id()
         for rec in drivers:
             rec["FILE_ID"] = file_id
-        save_json(drivers, "ACTIVE_DRIVERS.json", output_dir)
+        save_json(drivers, "DRIVERS.json", output_dir)
 
     if "trucks" in entities:
         trucks = fetch_paginated_data(
@@ -157,21 +157,21 @@ def export_endpoints(
                 "truckNumber": "",
                 "fleetName": "",
                 "vinNumber": "",
-                "isActive": True,
                 "registeredName": "",
+                "status": [],
             },
         )
         file_id = get_file_id()
         for rec in trucks:
             rec["FILE_ID"] = file_id
-        save_json(trucks, "ACTIVE_TRUCKS.json", output_dir)
+        save_json(trucks, "TRUCKS.json", output_dir)
 
     if "trailers" in entities:
         trailers = fetch_paginated_data(
             f"{urls['base_url']}/trailers/search",
             headers,
             {
-                "status": ["Active"],
+                "status": [],
                 "trailerNumber": "",
                 "fleetName": "",
                 "vinNumber": "",
@@ -180,18 +180,18 @@ def export_endpoints(
         file_id = get_file_id()
         for rec in trailers:
             rec["FILE_ID"] = file_id
-        save_json(trailers, "ACTIVE_TRAILERS.json", output_dir)
+        save_json(trailers, "TRAILERS.json", output_dir)
 
     if "customers" in entities:
         customers = fetch_paginated_data(
             f"{urls['base_url']}/customers/search",
             headers,
-            {"statuses": ["Active"]},
+            {"statuses": ["Active", "Inactive", "Disabled"]},
         )
         file_id = get_file_id()
         for rec in customers:
             rec["FILE_ID"] = file_id
-        save_json(customers, "ACTIVE_CUSTOMERS.json", output_dir)
+        save_json(customers, "CUSTOMERS.json", output_dir)
 
 
 def main():
@@ -254,44 +254,44 @@ def main():
                 save_json(data, filename)
 
     if run_all or "drivers" in args:
-        print("Fetching Active Drivers...")
+        print("Fetching Drivers...")
         drivers = fetch_paginated_data(
             f"{BASE_URL}/drivers/search", headers,
             {
                 "name": "",
                 "employeeId": "",
                 "fleetName": "",
-                "isActive": True
+                "status": []
             }
         )
         file_id = get_file_id()
         for rec in drivers:
             rec["FILE_ID"] = file_id
-        save_json(drivers, "ACTIVE_DRIVERS.json")
+        save_json(drivers, "DRIVERS.json")
 
     if run_all or "trucks" in args:
-        print("Fetching Active Trucks...")
+        print("Fetching Trucks...")
         trucks = fetch_paginated_data(
             f"{BASE_URL}/trucks/search", headers,
             {
                 "truckNumber": "",
                 "fleetName": "",
                 "vinNumber": "",
-                "isActive": True,
-                "registeredName": ""
+                "registeredName": "",
+                "status": []
             }
         )
         file_id = get_file_id()
         for rec in trucks:
             rec["FILE_ID"] = file_id
-        save_json(trucks, "ACTIVE_TRUCKS.json")
+        save_json(trucks, "TRUCKS.json")
 
     if run_all or "trailers" in args:
-        print("Fetching Active Trailers...")
+        print("Fetching Trailers...")
         trailers = fetch_paginated_data(
             f"{BASE_URL}/trailers/search", headers,
             {
-                "status": ["Active"],
+                "status": [],
                 "trailerNumber": "",
                 "fleetName": "",
                 "vinNumber": ""
@@ -300,20 +300,20 @@ def main():
         file_id = get_file_id()
         for rec in trailers:
             rec["FILE_ID"] = file_id
-        save_json(trailers, "ACTIVE_TRAILERS.json")
+        save_json(trailers, "TRAILERS.json")
 
     if run_all or "customers" in args:
-        print("Fetching Active Customers...")
+        print("Fetching Customers...")
         customers = fetch_paginated_data(
             f"{BASE_URL}/customers/search", headers,
             {
-                "statuses": ["Active"]
+                "statuses": ["Active", "Inactive", "Disabled"]
             }
         )
         file_id = get_file_id()
         for rec in customers:
             rec["FILE_ID"] = file_id
-        save_json(customers, "ACTIVE_CUSTOMERS.json")
+        save_json(customers, "CUSTOMERS.json")
 
     print("\n✅ Data pull complete.")
 
