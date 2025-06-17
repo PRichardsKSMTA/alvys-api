@@ -33,11 +33,9 @@ from __future__ import annotations
 
 import argparse
 import importlib
-import json
-import subprocess
 import sys
 from pathlib import Path
-from typing import Iterable, List, Tuple
+from typing import Iterable, List
 
 # ────────────────────────────────────────────
 # INTERNAL MODULES (small, fast to import)

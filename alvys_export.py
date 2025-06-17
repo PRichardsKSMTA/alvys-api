@@ -1,9 +1,13 @@
-import requests
-import os
 import json
+import os
 import sys
-from datetime import datetime
-from dotenv import load_dotenv # type: ignore
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Dict, Iterable, Tuple
+
+import requests
+from dotenv import load_dotenv  # type: ignore
+from config import build_auth_urls
 
 load_dotenv()
 
@@ -53,9 +57,9 @@ def fetch_paginated_data(url, headers, base_payload, max_items=None):
         page += 1
     return items if not max_items else items[:max_items]
 
-def save_json(data, filename):
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
-    filepath = os.path.join(OUTPUT_DIR, filename)
+def save_json(data, filename, output_dir: str | Path = OUTPUT_DIR):
+    os.makedirs(output_dir, exist_ok=True)
+    filepath = os.path.join(output_dir, filename)
     with open(filepath, "w") as f:
         json.dump(data, f, indent=2)
 
@@ -66,6 +70,129 @@ def format_range(start, end):
 
 def get_file_id():
     return datetime.utcnow().strftime("%Y%m%d%H%M%S%f")[:-3]  # yyyymmddHHMMSSmmm
+
+
+def export_endpoints(
+    entities: Iterable[str],
+    credentials: Dict[str, str],
+    date_range: Tuple[datetime, datetime],
+    output_dir: str | Path,
+):
+    """Export selected API endpoints for the given date range."""
+    urls = build_auth_urls(credentials["tenant_id"], API_VERSION)
+    token_resp = requests.post(urls["auth_url"], data={
+        "client_id": credentials["client_id"],
+        "client_secret": credentials["client_secret"],
+        "grant_type": credentials.get("grant_type", "client_credentials"),
+    })
+    token_resp.raise_for_status()
+    token = token_resp.json()["access_token"]
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "accept": "application/json",
+        "content-type": "application/*+json",
+    }
+
+    start_iso = (
+        date_range[0].astimezone(timezone.utc)
+        .isoformat(timespec="milliseconds")
+        .replace("+00:00", "Z")
+    )
+    end_iso = (
+        date_range[1].astimezone(timezone.utc)
+        .isoformat(timespec="milliseconds")
+        .replace("+00:00", "Z")
+    )
+
+    endpoints = {
+        "trips": {
+            "url": f"{urls['base_url']}/trips/search",
+            "extra_payload": {"status": ["Completed"], "range_field": "updatedAtRange"},
+        },
+        "loads": {
+            "url": f"{urls['base_url']}/loads/search",
+            "extra_payload": {"status": ["Open"], "range_field": "updatedAtRange"},
+        },
+        "invoices": {
+            "url": f"{urls['base_url']}/invoices/search",
+            "extra_payload": {"status": ["Paid"], "range_field": "invoicedDateRange"},
+        },
+    }
+
+    os.makedirs(output_dir, exist_ok=True)
+
+    for name, cfg in endpoints.items():
+        if name not in entities:
+            continue
+        range_field = cfg["extra_payload"].get("range_field", "updatedAtRange")
+        extra_payload = {k: v for k, v in cfg["extra_payload"].items() if k != "range_field"}
+        payload = {
+            range_field: {"start": start_iso, "end": end_iso},
+            **extra_payload,
+        }
+        data = fetch_paginated_data(cfg["url"], headers, payload)
+        file_id = get_file_id()
+        for rec in data:
+            rec["FILE_ID"] = file_id
+        fname = f"{name.upper()}_API_{format_range(start_iso, end_iso)}.json"
+        save_json(data, fname, output_dir)
+
+    # "Active" endpoints do not use date ranges
+    if "drivers" in entities:
+        drivers = fetch_paginated_data(
+            f"{urls['base_url']}/drivers/search",
+            headers,
+            {"name": "", "employeeId": "", "fleetName": "", "isActive": True},
+        )
+        file_id = get_file_id()
+        for rec in drivers:
+            rec["FILE_ID"] = file_id
+        save_json(drivers, "ACTIVE_DRIVERS.json", output_dir)
+
+    if "trucks" in entities:
+        trucks = fetch_paginated_data(
+            f"{urls['base_url']}/trucks/search",
+            headers,
+            {
+                "truckNumber": "",
+                "fleetName": "",
+                "vinNumber": "",
+                "isActive": True,
+                "registeredName": "",
+            },
+        )
+        file_id = get_file_id()
+        for rec in trucks:
+            rec["FILE_ID"] = file_id
+        save_json(trucks, "ACTIVE_TRUCKS.json", output_dir)
+
+    if "trailers" in entities:
+        trailers = fetch_paginated_data(
+            f"{urls['base_url']}/trailers/search",
+            headers,
+            {
+                "status": ["Active"],
+                "trailerNumber": "",
+                "fleetName": "",
+                "vinNumber": "",
+            },
+        )
+        file_id = get_file_id()
+        for rec in trailers:
+            rec["FILE_ID"] = file_id
+        save_json(trailers, "ACTIVE_TRAILERS.json", output_dir)
+
+    if "customers" in entities:
+        customers = fetch_paginated_data(
+            f"{urls['base_url']}/customers/search",
+            headers,
+            {"statuses": ["Active"]},
+        )
+        file_id = get_file_id()
+        for rec in customers:
+            rec["FILE_ID"] = file_id
+        save_json(customers, "ACTIVE_CUSTOMERS.json", output_dir)
+
 
 def main():
     args = [arg.lower() for arg in sys.argv[1:]]
