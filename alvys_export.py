@@ -142,7 +142,7 @@ def export_endpoints(
         drivers = fetch_paginated_data(
             f"{urls['base_url']}/drivers/search",
             headers,
-            {"name": "", "employeeId": "", "fleetName": "", "isActive": True},
+            {"name": "", "employeeId": "", "fleetName": "", "status": []},
         )
         file_id = get_file_id()
         for rec in drivers:
@@ -157,8 +157,8 @@ def export_endpoints(
                 "truckNumber": "",
                 "fleetName": "",
                 "vinNumber": "",
-                "isActive": True,
                 "registeredName": "",
+                "status": [],
             },
         )
         file_id = get_file_id()
@@ -171,7 +171,7 @@ def export_endpoints(
             f"{urls['base_url']}/trailers/search",
             headers,
             {
-                "status": ["Active"],
+                "status": [],
                 "trailerNumber": "",
                 "fleetName": "",
                 "vinNumber": "",
@@ -186,7 +186,7 @@ def export_endpoints(
         customers = fetch_paginated_data(
             f"{urls['base_url']}/customers/search",
             headers,
-            {"statuses": ["Active"]},
+            {"statuses": ["Active", "Inactive", "Disabled"]},
         )
         file_id = get_file_id()
         for rec in customers:
@@ -261,7 +261,7 @@ def main():
                 "name": "",
                 "employeeId": "",
                 "fleetName": "",
-                "isActive": True
+                "status": []
             }
         )
         file_id = get_file_id()
@@ -277,8 +277,8 @@ def main():
                 "truckNumber": "",
                 "fleetName": "",
                 "vinNumber": "",
-                "isActive": True,
-                "registeredName": ""
+                "registeredName": "",
+                "status": []
             }
         )
         file_id = get_file_id()
@@ -291,7 +291,7 @@ def main():
         trailers = fetch_paginated_data(
             f"{BASE_URL}/trailers/search", headers,
             {
-                "status": ["Active"],
+                "status": [],
                 "trailerNumber": "",
                 "fleetName": "",
                 "vinNumber": ""
@@ -307,7 +307,7 @@ def main():
         customers = fetch_paginated_data(
             f"{BASE_URL}/customers/search", headers,
             {
-                "statuses": ["Active"]
+                "statuses": ["Active", "Inactive", "Disabled"]
             }
         )
         file_id = get_file_id()
