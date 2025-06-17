@@ -93,6 +93,25 @@ def sanitize_customer(c: Dict) -> Dict:
         "FILE_ID": c.get("FILE_ID")
     }
 
+def sanitize_carrier(c: Dict) -> Dict:
+    address = c.get("Address", {})
+    return {
+        "ID": c.get("Id"),
+        "CARRIER_NAME": c.get("Name"),
+        "EXTERNAL_NAME": c.get("ExternalName"),
+        "CITY": address.get("City"),
+        "STATE": address.get("State"),
+        "ZIP": address.get("ZipCode"),
+        "MC_NUM": c.get("McNum"),
+        "US_DOT_NUM": c.get("UsDotNum"),
+        "CARRIER_TYPE": c.get("Type"),
+        "CARRIER_STATUS": c.get("Status"),
+        "CARRIER_SOURCE": c.get("Source"),
+        "UPDATED_DTTM": safe_datetime(c.get("UpdatedAt")),
+        "CREATED_DTTM": safe_datetime(c.get("CreatedAt")),
+        "FILE_ID": c.get("FILE_ID")
+    }
+
 def batch_insert(table: str, records: List[Dict], conn):
     if not records:
         print(f"No data to insert for {table}.")
@@ -142,6 +161,13 @@ def main():
         print("Loading customers JSON...")
         customers = [sanitize_customer(c) for c in load_json("CUSTOMERS.json")]
         batch_insert("CUSTOMERS_RAW", customers, conn)
+
+    if run_all or "carriers" in args:
+        print("Loading carriers JSON...")
+        raw = load_json("CARRIERS.json")
+        items = raw.get("Items") if isinstance(raw, dict) else raw
+        carriers = [sanitize_carrier(c) for c in items]
+        batch_insert("CARRIERS_RAW", carriers, conn)
 
     print("\n✅ All data inserted.")
 

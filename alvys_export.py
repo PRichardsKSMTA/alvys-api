@@ -193,6 +193,27 @@ def export_endpoints(
             rec["FILE_ID"] = file_id
         save_json(customers, "CUSTOMERS.json", output_dir)
 
+    if "carriers" in entities:
+        carriers = fetch_paginated_data(
+            f"{urls['base_url']}/carriers/search",
+            headers,
+            {
+                "status": [
+                    "Pending",
+                    "Active",
+                    "Expired Insurance",
+                    "Interested",
+                    "Invited",
+                    "Packet Sent",
+                    "Packet Completed",
+                ],
+            },
+        )
+        file_id = get_file_id()
+        for rec in carriers:
+            rec["FILE_ID"] = file_id
+        save_json(carriers, "CARRIERS.json", output_dir)
+
 
 def main():
     args = [arg.lower() for arg in sys.argv[1:]]
@@ -314,6 +335,27 @@ def main():
         for rec in customers:
             rec["FILE_ID"] = file_id
         save_json(customers, "CUSTOMERS.json")
+
+    if run_all or "carriers" in args:
+        print("Fetching Carriers...")
+        carriers = fetch_paginated_data(
+            f"{BASE_URL}/carriers/search", headers,
+            {
+                "status": [
+                    "Pending",
+                    "Active",
+                    "Expired Insurance",
+                    "Interested",
+                    "Invited",
+                    "Packet Sent",
+                    "Packet Completed",
+                ]
+            }
+        )
+        file_id = get_file_id()
+        for rec in carriers:
+            rec["FILE_ID"] = file_id
+        save_json(carriers, "CARRIERS.json")
 
     print("\n✅ Data pull complete.")
 
