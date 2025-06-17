@@ -55,6 +55,7 @@ ENTITIES = [
     "trucks",
     "trailers",
     "customers",
+    "carriers",
 ]
 
 # ────────────────────────────────────────────
